@@ -1,12 +1,14 @@
 import React from 'react'
-import { BrowserRouter, Route } from 'react-router-dom'
+import { BrowserRouter } from 'react-router-dom'
 import Routes from './routes'
+import GlobalStyle from './styles/global'
 
 export default function App() {
     return (
         <BrowserRouter>
             {/* <Header /> */}
             <Routes />
+            <GlobalStyle></GlobalStyle>
         </BrowserRouter>
         )
 }

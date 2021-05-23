@@ -1,80 +1,59 @@
-import React from 'react';
-import {MdAddShoppingCart} from 'react-icons/md'
+import React, { Component } from 'react';
+import { MdAddShoppingCart } from 'react-icons/md'
+import { formatPrice } from '../../util/format'
+
+import api from '../../services/api'
 
 import { ProductList } from './styles'
 
 // import { Container } from './styles';
 
-function Home() {
-    return (
-        <ProductList>
-            <li>
-                <img src="https://static.netshoes.com.br/produtos/tenis-olympikus-attract-se-815-masculino/26/D22-3836-026/D22-3836-026_zoom2.jpg?ts=1585920125&ims=326x" 
-                alt="Tenis"></img>
-            <strong>Tênis 1</strong>
-            <span>R$ 129,00</span>
+export default class Home extends Component {
+    state = {
+        products: [],
+    }
 
-            <button type="button">
-                <div>
-                    <MdAddShoppingCart size={16} color="#FFF"> 3 </MdAddShoppingCart>
-                </div>
-                <span> ADICIONAR AO CARRINHO </span>
-            </button>
-            </li>
-            <li>
-                <img src="https://static.netshoes.com.br/produtos/tenis-olympikus-attract-se-815-masculino/26/D22-3836-026/D22-3836-026_zoom2.jpg?ts=1585920125&ims=326x" 
-                alt="Tenis"></img>
-            <strong>Tênis 1</strong>
-            <span>R$ 129,00</span>
+    async componentDidMount() {
+        const response = await api.get('products');
 
-            <button type="button">
-                <div>
-                    <MdAddShoppingCart size={16} color="#FFF"> 3 </MdAddShoppingCart>
-                </div>
-                <span> ADICIONAR AO CARRINHO </span>
-            </button>
-            </li>
-            <li>
-                <img src="https://static.netshoes.com.br/produtos/tenis-olympikus-attract-se-815-masculino/26/D22-3836-026/D22-3836-026_zoom2.jpg?ts=1585920125&ims=326x" 
-                alt="Tenis"></img>
-            <strong>Tênis 1</strong>
-            <span>R$ 129,00</span>
+        /**
+         * Adicionando um atributo chamad priceFormatted (Formatação dos preços),
+         * para ser utilizado a função de formatação apenas uma vez, quando é 
+         * feito o get dos produtos na API, podendo assim disponibilizar essa 
+         * variavel para o ProductList, sem precisar ficar chamando essa função 
+         * toda vez que a pagina der f5.
+         */
+        const data = response.data.map(product => ({
+            ...product,
+            priceFormatted: formatPrice(product.price)
+        }));
 
-            <button type="button">
-                <div>
-                    <MdAddShoppingCart size={16} color="#FFF"> 3 </MdAddShoppingCart>
-                </div>
-                <span> ADICIONAR AO CARRINHO </span>
-            </button>
-            </li>
-            <li>
-                <img src="https://static.netshoes.com.br/produtos/tenis-olympikus-attract-se-815-masculino/26/D22-3836-026/D22-3836-026_zoom2.jpg?ts=1585920125&ims=326x" 
-                alt="Tenis"></img>
-            <strong>Tênis 1</strong>
-            <span>R$ 129,00</span>
+        this.setState({ products: data })
+    }
 
-            <button type="button">
-                <div>
-                    <MdAddShoppingCart size={16} color="#FFF"> 3 </MdAddShoppingCart>
-                </div>
-                <span> ADICIONAR AO CARRINHO </span>
-            </button>
-            </li>
-            <li>
-                <img src="https://static.netshoes.com.br/produtos/tenis-olympikus-attract-se-815-masculino/26/D22-3836-026/D22-3836-026_zoom2.jpg?ts=1585920125&ims=326x" 
-                alt="Tenis"></img>
-            <strong>Tênis 1</strong>
-            <span>R$ 129,00</span>
+    render(){
 
-            <button type="button">
-                <div>
-                    <MdAddShoppingCart size={16} color="#FFF"> 3 </MdAddShoppingCart>
-                </div>
-                <span> ADICIONAR AO CARRINHO </span>
-            </button>
-            </li>
-        </ProductList>
-        );
+        const { products } = this.state 
+
+        return (
+            <ProductList>
+                { products.map(product => (
+                <li key={product.id}>
+                    <img src={product.image}
+                        alt={product.title}></img>
+                    <strong>{product.title}</strong>
+                    <span>{product.priceFormatted}</span>
+        
+                    <button type="button">
+                        <div>
+                            <MdAddShoppingCart size={16} color="#FFF"> 3 </MdAddShoppingCart>
+                        </div>
+                        <span> ADICIONAR AO CARRINHO </span>
+                    </button>
+                </li>
+                ))}
+                
+            </ProductList>
+            );
+    }
 }
-
-export default Home;

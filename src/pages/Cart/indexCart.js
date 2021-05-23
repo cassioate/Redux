@@ -1,9 +1,13 @@
 import React from 'react';
+import { connect } from 'react-redux'
 import { MdRemoveCircleOutline, MdAddCircleOutline, MdDelete } from 'react-icons/md'
 
 import { Container, ProductTable,Total } from './styles'
 
-function Cart() {
+function Cart({cart}) {
+
+    console.log(cart)
+
   return (
     <Container>
         <ProductTable>
@@ -17,20 +21,22 @@ function Cart() {
                 </tr>
             </thead>
             <tbody>
-                <tr>
+                { cart.map(product => (
+                    <tr>
                     <td>
-                        <img src="https://static.netshoes.com.br/produtos/tenis-olympikus-attract-se-815-masculino/26/D22-3836-026/D22-3836-026_zoom2.jpg?ts=1585920125&ims=326x" alt="Tenis"></img>
+                        <img src={product.image} 
+                        alt={product.title}></img>
                     </td>
                     <td>
-                        <strong>Tênis muito massa</strong>
-                        <span>R$129,90</span>
+                        <strong>{product.title}</strong>
+                        <span>{product.priceFormatted}</span>
                     </td>
                     <td>
                         <div>
                             <button type="button">
                                 <MdRemoveCircleOutline size={20} color="#7159c1"></MdRemoveCircleOutline>
                             </button>
-                            <input type="number" readOnly value={1} />
+                            <input type="number" readOnly value={product.amount} />
                             <button type="button">
                                 <MdAddCircleOutline size={20} color="#7159c1"></MdAddCircleOutline>
 
@@ -46,6 +52,7 @@ function Cart() {
                         </button>
                     </td>
                 </tr>
+                ))}    
             </tbody>
         </ProductTable>
 
@@ -60,4 +67,8 @@ function Cart() {
     );
 }
 
-export default Cart;
+const mapStateToProps = state => ({
+    cart: state.ReducerCart
+})
+
+export default connect(mapStateToProps)(Cart);

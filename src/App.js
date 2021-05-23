@@ -5,6 +5,8 @@ import Routes from './routes'
 
 import Header from './components/Header/indexHeader'
 import GlobalStyle from './styles/global'
+
+import './config/ReactotronConfig'
 import store from './store/indexRedux'
 
 export default function App() {

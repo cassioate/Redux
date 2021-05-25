@@ -9,16 +9,16 @@ import { Container, ProductTable, Total } from './styles'
 import { formatPrice } from '../../util/format'
 
 
-function Cart({cart, total, removeFromCart, updateAmount }) {
+function Cart({cart, total, removeFromCart, updateAmountRequest }) {
 
     function increment (product) {
         // UpdateAmount é um dispatch!! Por isso envia o state no reducer
-        updateAmount(product.id, product.amount +1)
+        updateAmountRequest(product.id, product.amount +1)
     }
 
     function decrement (product) {
         // UpdateAmount é um dispatch!!
-        updateAmount(product.id, product.amount -1)
+        updateAmountRequest(product.id, product.amount -1)
     }
 
   return (

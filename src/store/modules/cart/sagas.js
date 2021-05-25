@@ -2,7 +2,7 @@ import { all, select, call, put, takeLatest } from 'redux-saga/effects'
 import api from '../../../services/api'
 import { formatPrice } from '../../../util/format'
 import { toast } from 'react-toastify'
-import {addToCartSucess, updateAmount} from './actionsCart'
+import {addToCartSuccess, updateAmountSuccess} from './actionsCart'
 
 // esse function* é igual a utilizar async function, só que o function* é mais potente
 // o ID está com {id} pois vc está buscando apenas o id da ActionCart, lá virá um type e um id como objeto, mas vc só quer o id. (Destructuring)
@@ -31,7 +31,7 @@ function* addToCart( { id } ) {
     
     if (productExists) {
         // Se o produto existir, eu apenas aumento o amount do STATe dele no lugar de duplicar o item.
-        yield put(updateAmount(id, amount))
+        yield put(updateAmountSuccess(id, amount))
     } else {
         // Se o produto não existir eu busco todos os dados desse produto na API, para inserir ele a primeira vez no carrinho
 
@@ -44,10 +44,25 @@ function* addToCart( { id } ) {
             priceFormatted: formatPrice(response.data.price)
         }
 
-        yield put(addToCartSucess(data));
+        yield put(addToCartSuccess(data));
     }
+}
+
+function* updateToCartAmount( { id, amount } ) {
+    if (amount <= 0) return
+
+    const stock = yield call(api.get, `stock/${id}`);
+    const stockAmount = stock.data.amount
+
+    if (amount > stockAmount){
+        toast.error('Quantidade fora de estoque.')
+        return 
+    }
+
+    yield put(updateAmountSuccess(id, amount))
 }
 
 export default all([
     takeLatest('@cart/ADD_TO_CART_REQUEST', addToCart),
+    takeLatest('@cart/UPDATE_AMOUNT_REQUEST', updateToCartAmount),
 ])

@@ -9,7 +9,7 @@ import { Container, ProductTable, Total } from './styles'
 import { formatPrice } from '../../util/format'
 
 
-function Cart({cart, removeFromCart, updateAmount }) {
+function Cart({cart, total, removeFromCart, updateAmount }) {
 
     function increment (product) {
         // UpdateAmount é um dispatch!! Por isso envia o state no reducer
@@ -35,7 +35,7 @@ function Cart({cart, removeFromCart, updateAmount }) {
             </thead>
             <tbody>
                 { cart.map(product => (
-                    <tr>
+                <tr key={product.id}>
                     <td>
                         <img src={product.image} 
                         alt={product.title}></img>
@@ -73,7 +73,7 @@ function Cart({cart, removeFromCart, updateAmount }) {
         <footer>
             <Total>
                 <span>TOTAL</span>
-                <strong>R$ 1.920,28</strong>
+                <strong>{total}</strong>
             </Total>
             <button type="button">Finalizar pedido</button>
         </footer>
@@ -86,7 +86,14 @@ const mapStateToProps = stateReducer => ({
     cart: stateReducer.ReducerCart.map(product => ({
         ...product,
         subtotal: formatPrice(product.price * product.amount)
-    }))
+    })),
+    // Estou realizando o calculo do valor total, inicializando uma variavel "(/**total**/, product)", 
+    //sendo essa variavel total inciada no valor 0! E a variavel product é cada produto dentro do array state
+    total: formatPrice(
+        stateReducer.ReducerCart.reduce((total, product) => {
+            return total + product.price * product.amount
+        }, 0)
+    )
 })
 
 const mapDispatchToProps = dispatch => 

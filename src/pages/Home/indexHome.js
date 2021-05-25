@@ -49,6 +49,7 @@ class Home extends Component {
     render(){
 
         const { products } = this.state 
+        const { amountThisItemInCart } = this.props
 
         return (
             <ProductList>
@@ -61,7 +62,7 @@ class Home extends Component {
         
                     <button type="button" onClick={() => this.handleAddProduct(product)}>
                         <div>
-                            <MdAddShoppingCart size={16} color="#FFF"> 3 </MdAddShoppingCart>
+                            <MdAddShoppingCart size={16} color="#FFF"></MdAddShoppingCart> {' '} {amountThisItemInCart[product.id] || 0}
                         </div>
                         <span> ADICIONAR AO CARRINHO </span>
                     </button>
@@ -73,7 +74,19 @@ class Home extends Component {
     }
 }
 
+// Ele vai pegar a quantidade de cada item especifico no carrinho, para expor na Home ao lado do "ADICIONAR AO CARRINHO"
+const mapStateToProps = stateReducer => ({
+    amountThisItemInCart: stateReducer.ReducerCart.reduce((amountThisItem, product) => {
+       
+        // Product.id vai ser a chave(Essa chave virará o id de product id, exemplo "1" = product.amount),
+        // product.amount é a quantidade desse item que já está contabilizado dentro do stateReducer
+        amountThisItem[product.id] = product.amount
+
+        return amountThisItem;
+    }, {})
+})
+
 const mapDispatchToProps = dispatch =>
     bindActionCreators(ActionCart, dispatch)
 
-export default connect(null, mapDispatchToProps)(Home)
+export default connect(mapStateToProps, mapDispatchToProps)(Home)

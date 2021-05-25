@@ -1,13 +1,26 @@
 import React from 'react';
 import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux';
 import { MdRemoveCircleOutline, MdAddCircleOutline, MdDelete } from 'react-icons/md'
 
 import * as ActionCart from '../../store/modules/cart/actionsCart'
 
 import { Container, ProductTable, Total } from './styles'
-import { bindActionCreators } from 'redux';
+import { formatPrice } from '../../util/format'
 
-function Cart({cart, removeFromCart}) {
+
+function Cart({cart, removeFromCart, updateAmount }) {
+
+    function increment (product) {
+        // UpdateAmount é um dispatch!! Por isso envia o state no reducer
+        updateAmount(product.id, product.amount +1)
+    }
+
+    function decrement (product) {
+        // UpdateAmount é um dispatch!!
+        updateAmount(product.id, product.amount -1)
+    }
+
   return (
     <Container>
         <ProductTable>
@@ -34,17 +47,17 @@ function Cart({cart, removeFromCart}) {
                     <td>
                         <div>
                             <button type="button">
-                                <MdRemoveCircleOutline size={20} color="#7159c1"></MdRemoveCircleOutline>
+                                <MdRemoveCircleOutline size={20} color="#7159c1" onClick={() => decrement(product)}></MdRemoveCircleOutline>
                             </button>
                             <input type="number" readOnly value={product.amount} />
                             <button type="button">
-                                <MdAddCircleOutline size={20} color="#7159c1"></MdAddCircleOutline>
+                                <MdAddCircleOutline size={20} color="#7159c1" onClick={() => increment(product)}></MdAddCircleOutline>
 
                             </button>
                         </div>
                     </td>
                     <td>
-                        <strong>{product.amount * product.price}</strong>
+                        <strong>{product.subtotal}</strong>
                     </td>
                     <td>
                         <button type="button" 
@@ -68,8 +81,12 @@ function Cart({cart, removeFromCart}) {
     );
 }
 
-const mapStateToProps = state => ({
-    cart: state.ReducerCart
+const mapStateToProps = stateReducer => ({
+    // Estou adicionando o subtotal diretamente no state que está vindo de reducer de forma a pdoer utilizar no HTML
+    cart: stateReducer.ReducerCart.map(product => ({
+        ...product,
+        subtotal: formatPrice(product.price * product.amount)
+    }))
 })
 
 const mapDispatchToProps = dispatch => 

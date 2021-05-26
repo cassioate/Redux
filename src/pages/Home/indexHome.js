@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { connect } from 'react-redux'
-import { bindActionCreators } from 'redux';
+import { useDispatch, useSelector } from 'react-redux'
 import { MdAddShoppingCart } from 'react-icons/md'
 import { formatPrice } from '../../util/format'
 
@@ -10,9 +9,20 @@ import api from '../../services/api'
 
 import { ProductList } from './styles'
 
-function Home({amountThisItemInCart, addToCartRequest}) {
-
+export default function Home() {
+    
     const [products, setProducts] = useState([])
+    
+    // o hook useSelector fará a busca do STATE do reducer no lugar de utilizar mapToState.
+    const amountThisItemInCart = useSelector(stateReducer => stateReducer.ReducerCart.reduce((amountThisItem, product) => {
+       
+        // Product.id vai ser a chave(Essa chave virará o id de product id, exemplo "1" = product.amount),
+        // product.amount é a quantidade desse item que já está contabilizado dentro do stateReducer
+        amountThisItem[product.id] = product.amount
+
+        return amountThisItem;
+    }, {})
+    );
 
     /** Utilizando async await dentro de um useEffect() */
     useEffect(()=>{
@@ -23,7 +33,6 @@ function Home({amountThisItemInCart, addToCartRequest}) {
                 ...product,
                 priceFormatted: formatPrice(product.price)
             }));   
-            console.log(data)
             setProducts (data)
         }
 
@@ -31,8 +40,10 @@ function Home({amountThisItemInCart, addToCartRequest}) {
     }
     , [])
 
+    const dispatch = useDispatch()
+
     function handleAddProduct(id) {
-       addToCartRequest(id)
+       dispatch(ActionCart.addToCartRequest(id));
     }
 
         return (
@@ -56,28 +67,6 @@ function Home({amountThisItemInCart, addToCartRequest}) {
             </ProductList>
             );
     }
-
-
-// Ele vai pegar a quantidade de cada item especifico no carrinho, para expor na Home ao lado do "ADICIONAR AO CARRINHO"
-const mapStateToProps = stateReducer => ({
-    // "AmountThisItem" é uma variavel que eu escolhi para ser uma "KEY" nesse objeto apenas, "product" é o sate dentro do ReducerCart,
-    // no caso eu estou adicionado a uma KEY o valor de product.amount(do estado), e assim eu acabo criando um array com varios desse objeto.
-    // Onde no html eu vou buscar esse cara pela KEY(product.id) e será retornado o valor de product.amount
-    amountThisItemInCart: stateReducer.ReducerCart.reduce((amountThisItem, product) => {
-       
-        // Product.id vai ser a chave(Essa chave virará o id de product id, exemplo "1" = product.amount),
-        // product.amount é a quantidade desse item que já está contabilizado dentro do stateReducer
-        amountThisItem[product.id] = product.amount
-
-        return amountThisItem;
-    }, {})
-})
-
-const mapDispatchToProps = dispatch =>
-    bindActionCreators(ActionCart, dispatch)
-
-export default connect(mapStateToProps, mapDispatchToProps)(Home)
-
 
 
 

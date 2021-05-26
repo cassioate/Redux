@@ -1,5 +1,5 @@
 import React from 'react';
-import { connect } from 'react-redux'
+import { connect, useDispatch, useSelector } from 'react-redux'
 import { bindActionCreators } from 'redux';
 import { MdRemoveCircleOutline, MdAddCircleOutline, MdDelete } from 'react-icons/md'
 
@@ -9,16 +9,34 @@ import { Container, ProductTable, Total } from './styles'
 import { formatPrice } from '../../util/format'
 
 
-function Cart({cart, total, removeFromCart, updateAmountRequest }) {
+export default function Cart() {
+
+    const dispatch = useDispatch();
+
+    // Pegando state do REDUX
+    const total = useSelector(stateReducer => formatPrice(
+        stateReducer.ReducerCart.reduce((total, product) => {
+            return total + product.price * product.amount
+        }, 0)
+    ));
+
+    // Pegando state do REDUX
+    const cart = useSelector(stateReducer => stateReducer.ReducerCart.map(product => ({
+        ...product,
+        subtotal: formatPrice(product.price * product.amount)
+    }))
+    );
 
     function increment (product) {
-        // UpdateAmount é um dispatch!! Por isso envia o state no reducer
-        updateAmountRequest(product.id, product.amount +1)
+        dispatch(ActionCart.updateAmountRequest(product.id, product.amount +1))
     }
 
     function decrement (product) {
-        // UpdateAmount é um dispatch!!
-        updateAmountRequest(product.id, product.amount -1)
+        dispatch(ActionCart.updateAmountRequest(product.id, product.amount -1))
+    }
+
+    function removeFromCart(id){
+        dispatch(ActionCart.removeFromCart(id));
     }
 
   return (
@@ -80,23 +98,3 @@ function Cart({cart, total, removeFromCart, updateAmountRequest }) {
     </Container>
     );
 }
-
-const mapStateToProps = stateReducer => ({
-    // Estou adicionando o subtotal diretamente no state que está vindo de reducer de forma a pdoer utilizar no HTML
-    cart: stateReducer.ReducerCart.map(product => ({
-        ...product,
-        subtotal: formatPrice(product.price * product.amount)
-    })),
-    // Estou realizando o calculo do valor total, inicializando uma variavel "(/**total**/, product)", 
-    //sendo essa variavel total inciada no valor 0! E a variavel product é cada produto dentro do array state
-    total: formatPrice(
-        stateReducer.ReducerCart.reduce((total, product) => {
-            return total + product.price * product.amount
-        }, 0)
-    )
-})
-
-const mapDispatchToProps = dispatch => 
-    bindActionCreators(ActionCart, dispatch)
-
-export default connect(mapStateToProps, mapDispatchToProps)(Cart);

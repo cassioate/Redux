@@ -1,12 +1,14 @@
 import React from 'react';
 import {Link} from 'react-router-dom'
-import { connect } from 'react-redux'
+import { connect, useSelector } from 'react-redux'
 import {MdShoppingBasket} from 'react-icons/md'
 
 import {Container, Cart} from './styles'
 import LogoRocketShoes from '../../assets/images/logo_rocket.svg'
 
-function Header({ cart }) {
+export default function Header() {
+
+    const cartSize = useSelector(state => state.ReducerCart.length)
 
   return (
     <Container>
@@ -17,7 +19,7 @@ function Header({ cart }) {
         <Cart to={"/cart"}>
             <div>
                 <strong>Meu carrinho</strong>
-                <span>{cart.length} Itens</span>
+                <span>{cartSize} Itens</span>
             </div>
             <MdShoppingBasket size={36} color="#FFF"></MdShoppingBasket>
         </Cart>
@@ -25,8 +27,3 @@ function Header({ cart }) {
     </Container>
     )
 }
-
-/** O nome do reducer tem que ser igual está no rootReducer.js */
-export default connect(reducer => ({
-    cart: reducer.ReducerCart
-}))(Header);
